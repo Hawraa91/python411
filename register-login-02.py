@@ -220,8 +220,8 @@ class AuthenticationApp:
         else:
             print(f"Error scanning URL '{url}': {response.text}")
             return 'error scanning URL'
-        
-        
+
+
         
     def send_message(self):
         if not self.clientsocket:
@@ -250,6 +250,18 @@ class AuthenticationApp:
             self.clientsocket.close()
             messagebox.showinfo("Chat Closed", "Chat has been terminated.")
             self.clientsocket = None
+
+    def display_user_chat_history(self, username):
+        all_chat_history_file = "all_chat_history.csv"
+        try:
+            with open(all_chat_history_file, 'r') as history_file:
+                reader = csv.reader(history_file)
+                chat_history = "\n".join([f"{row[0]} - {row[1]}: {row[2]}" for row in reader if row[1] == username])
+                # Update the Text widget to display chat history
+                self.conversation_text.insert(tk.END, chat_history)
+                self.conversation_text.see(tk.END)  # Scroll to the bottom
+        except FileNotFoundError:
+            messagebox.showinfo("Chat History", "No chat history found.")
 
 if __name__ == "__main__":
     root = tk.Tk()
