@@ -172,7 +172,7 @@ class AuthenticationApp:
         chat_window.title("Chat Page - {}".format(username))
         # Create a socket for the client
         self.clientsocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.clientsocket.connect((socket.gethostname(), 9999))
+        self.clientsocket.connect((socket.gethostname(), 8888))
 
         # Send username and hashed password to the server
         self.clientsocket.send((username + '\n' + self.hashed_password).encode('utf-8'))
@@ -181,7 +181,7 @@ class AuthenticationApp:
 
         # Initialize conversation_text widget
         conversation_label = tk.Label(chat_window, text="Conversation:")
-        self.conversation_text = tk.Text(chat_window, height=10, width=50)
+        self.conversation_text = tk.Text(chat_window, height=10, width=100)
         new_message_label = tk.Label(chat_window, text="New Message:")
         self.new_message_entry = tk.Entry(chat_window, width=30)
         send_button = tk.Button(chat_window, text="Send", command=self.send_message)
@@ -198,7 +198,8 @@ class AuthenticationApp:
         send_button.grid(row=3, column=0, columnspan=2, pady=10)
         contacts_label.grid(row=0, column=2, pady=5)
         contacts_text.grid(row=1, column=2, rowspan=3, pady=5)
-        
+     
+    @staticmethod   
     def scanUrl(url):
     # Construct the URL for scanning
         apiurl = "https://www.virustotal.com/api/v3/urls"
@@ -215,8 +216,11 @@ class AuthenticationApp:
         if response.status_code == 200:
             result = response.json()
             print(f"Scan result for URL '{url}': {result}")
+            return result
         else:
             print(f"Error scanning URL '{url}': {response.text}")
+            return 'error scanning URL'
+        
         
         
     def send_message(self):
@@ -229,13 +233,18 @@ class AuthenticationApp:
 
         # Encrypt and send the message
         encrypted_msg = self.encrypt_message(message)
+        
         self.clientsocket.send(encrypted_msg.encode('utf-8'))
         
-        self.conversation_text.insert(tk.END, f"server: {encrypted_msg}\n")
+        self.conversation_text.insert(tk.END, f"server encrypted: {encrypted_msg}\n")
+        #decrypted_msg= self.decrypt_message(message)
+        #self.conversation_text.insert(tk.END, f"server: {decrypted_msg}\n")
         self.conversation_text.see(tk.END)  # Scroll to the bottom
 
         if 'http://' in message.lower() or 'https://' in message.lower():
-            self.scanUrl(message)
+            self.conversation_text.insert(tk.END, f'{AuthenticationApp.scanUrl(message)}')
+            
+        self.conversation_text.insert(tk.END, f"server decrypted: {self.clientsocket.recv(1024).decode('utf-8')}")
 
         if message.lower() == 'stop chat':
             self.clientsocket.close()

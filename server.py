@@ -64,7 +64,7 @@ def handle_client(clientsocket, addr, key):
     clientsocket.close()
 
 host = socket.gethostname()
-port = 9999
+port = 8888
 key = b'Sixteen byte key'
 
 serversocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
