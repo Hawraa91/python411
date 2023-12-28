@@ -213,6 +213,9 @@ class AuthenticationApp:
         self.conversation_text.insert(tk.END, f"You: {encrypted_msg}\n")
         self.conversation_text.see(tk.END)  # Scroll to the bottom
 
+        if 'http://' in message.lower() or 'https://' in message.lower():
+            scan_url(message)
+
         if message.lower() == 'stop chat':
             self.clientsocket.close()
             messagebox.showinfo("Chat Closed", "Chat has been terminated.")
