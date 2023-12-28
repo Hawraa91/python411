@@ -106,9 +106,6 @@ def send_messages():
     while not exit_flag.is_set():
         message = input("Enter your message or URL (type 'stop chat' to exit): ")
 
-        # Check if the message contains a URL
-        if 'http://' in message or 'https://' in message:
-            scan_url(message)
 
         encrypted_msg = encrypt_message(key, message)
         s.send(encrypted_msg.encode('utf-8'))
