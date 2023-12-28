@@ -56,25 +56,25 @@ def check_credentials(username, hashed_password):
         return False
 
 
-def scan_url(url):
-    # Construct the URL for scanning
+# def scan_url(url):
+#     # Construct the URL for scanning
 
-    apiurl = "https://www.virustotal.com/api/v3/urls"
-    payload = {"url": f'{url}'}
-    headers = {
-        "accept": "application/json",
-        "x-apikey": 'ddba54d29f6a46137aff14d2f1dd3e0ef2589e9fb811a1daca7562cda3dae120',
-        "content-type": "application/x-www-form-urlencoded"
-    }
-    # Make the request to VirusTotal
-    response = requests.post(apiurl, data=payload, headers=headers)
+#     apiurl = "https://www.virustotal.com/api/v3/urls"
+#     payload = {"url": f'{url}'}
+#     headers = {
+#         "accept": "application/json",
+#         "x-apikey": 'ddba54d29f6a46137aff14d2f1dd3e0ef2589e9fb811a1daca7562cda3dae120',
+#         "content-type": "application/x-www-form-urlencoded"
+#     }
+#     # Make the request to VirusTotal
+#     response = requests.post(apiurl, data=payload, headers=headers)
 
-    # Check the response
-    if response.status_code == 200:
-        result = response.json()
-        print(f"Scan result for URL '{url}': {result}")
-    else:
-        print(f"Error scanning URL '{url}': {response.text}")
+#     # Check the response
+#     if response.status_code == 200:
+#         result = response.json()
+#         print(f"Scan result for URL '{url}': {result}")
+#     else:
+#         print(f"Error scanning URL '{url}': {response.text}")
 
 
 host = socket.gethostname()

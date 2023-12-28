@@ -199,9 +199,8 @@ class AuthenticationApp:
         contacts_label.grid(row=0, column=2, pady=5)
         contacts_text.grid(row=1, column=2, rowspan=3, pady=5)
         
-    def scan_url(url):
+    def scanUrl(url):
     # Construct the URL for scanning
-
         apiurl = "https://www.virustotal.com/api/v3/urls"
         payload = {"url": f'{url}'}
         headers = {
@@ -236,7 +235,7 @@ class AuthenticationApp:
         self.conversation_text.see(tk.END)  # Scroll to the bottom
 
         if 'http://' in message.lower() or 'https://' in message.lower():
-            scan_url(message)
+            self.scanUrl(message)
 
         if message.lower() == 'stop chat':
             self.clientsocket.close()
