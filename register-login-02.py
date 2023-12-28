@@ -209,6 +209,9 @@ class AuthenticationApp:
         # Encrypt and send the message
         encrypted_msg = self.encrypt_message(message)
         self.clientsocket.send(encrypted_msg.encode('utf-8'))
+        
+        self.conversation_text.insert(tk.END, f"You: {encrypted_msg}\n")
+        self.conversation_text.see(tk.END)  # Scroll to the bottom
 
         if message.lower() == 'stop chat':
             self.clientsocket.close()

@@ -34,7 +34,6 @@ def start_new_client_thread(clientsocket, addr, key):
 
 def handle_client(clientsocket, addr, key):
     print("Got a connection from %s" % str(addr))
-    print("hi")
     # Receive client_name and hashed_password
     client_info = clientsocket.recv(1024).decode('utf-8')
     client_name, hashed_password = client_info.split('\n')
@@ -43,27 +42,21 @@ def handle_client(clientsocket, addr, key):
     print("Received client_name:", client_name)
     print("Received hashed_password:", hashed_password)
 
-
-    # if verify_credentials(client_name, hashed_password):
-    #     print("Client name:", client_name)
-    #     register_user(client_name, hashed_password)
-    #     print("Registered Users:")
-    #     with open('user_credentials.csv', 'r') as csvfile:
-    #         reader = csv.reader(csvfile)
-    #         for row in reader:
-    #             print(f"- {row[0]}")
-
     while True:
         encrypted_msg = clientsocket.recv(1024).decode('utf-8')
         decrypted_msg = decrypt_message(key, encrypted_msg)
 
         print("Received message from %s: %s" % (client_name, decrypted_msg))
         print("Encrypted message:", encrypted_msg)
+        
+        # Send the decrypted message back to the client
+        clientsocket.send(decrypted_msg.encode('utf-8'))
+
 
         if decrypted_msg.lower() == "stop chat":
                 print("Chat has been terminated")
                 break
-
+        
     print("Client %s disconnected" % client_name)
     #else:
         #print("Invalid username or password. Disconnecting client.")
