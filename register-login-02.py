@@ -6,6 +6,7 @@ import socket
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from cryptography.hazmat.primitives import padding
 from base64 import b64encode, b64decode
+import requests
 
 class AuthenticationApp:
     def __init__(self, root):
@@ -197,7 +198,28 @@ class AuthenticationApp:
         send_button.grid(row=3, column=0, columnspan=2, pady=10)
         contacts_label.grid(row=0, column=2, pady=5)
         contacts_text.grid(row=1, column=2, rowspan=3, pady=5)
+        
+    def scan_url(url):
+    # Construct the URL for scanning
 
+        apiurl = "https://www.virustotal.com/api/v3/urls"
+        payload = {"url": f'{url}'}
+        headers = {
+            "accept": "application/json",
+            "x-apikey": 'ddba54d29f6a46137aff14d2f1dd3e0ef2589e9fb811a1daca7562cda3dae120',
+            "content-type": "application/x-www-form-urlencoded"
+        }
+        # Make the request to VirusTotal
+        response = requests.post(apiurl, data=payload, headers=headers)
+
+        # Check the response
+        if response.status_code == 200:
+            result = response.json()
+            print(f"Scan result for URL '{url}': {result}")
+        else:
+            print(f"Error scanning URL '{url}': {response.text}")
+        
+        
     def send_message(self):
         if not self.clientsocket:
             messagebox.showerror("Error", "Not connected to the server.")
@@ -210,7 +232,7 @@ class AuthenticationApp:
         encrypted_msg = self.encrypt_message(message)
         self.clientsocket.send(encrypted_msg.encode('utf-8'))
         
-        self.conversation_text.insert(tk.END, f"You: {encrypted_msg}\n")
+        self.conversation_text.insert(tk.END, f"server: {encrypted_msg}\n")
         self.conversation_text.see(tk.END)  # Scroll to the bottom
 
         if 'http://' in message.lower() or 'https://' in message.lower():
