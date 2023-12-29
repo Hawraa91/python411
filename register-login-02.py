@@ -67,7 +67,7 @@ class AuthenticationApp:
 
     def encrypt_message(self, plaintext):
         plaintext = plaintext.encode('utf-8')
-        iv = b'1234567890123456'  # You should use a random IV for each message in a real-world scenario
+        iv = b'1234567890123456'  
         cipher = Cipher(algorithms.AES(self.key), modes.CBC(iv))
         encryptor = cipher.encryptor()
         padder = padding.PKCS7(128).padder()
@@ -84,6 +84,7 @@ class AuthenticationApp:
             if user["username"] == username and user["password"] == hashlib.sha256(password.encode('utf-8')).hexdigest():
                 messagebox.showinfo("Login Successful", "Welcome, {}!".format(username))
                 self.open_chat_page(username, hashed)
+                self.display_user_chat_history(username)
                 return
 
         messagebox.showerror("Login Failed", "Invalid username or password")
@@ -186,9 +187,19 @@ class AuthenticationApp:
         self.new_message_entry = tk.Entry(chat_window, width=50)
         send_button = tk.Button(chat_window, text="Send", command=self.send_message)
 
-        # Contacts placeholder
-        contacts_label = tk.Label(chat_window, text="Contacts:")
-        contacts_text = tk.Text(chat_window, height=5, width=30)
+        # Registered Users placeholder
+        regUse_label = tk.Label(chat_window, text="Registered Users:")
+        regUse_label.grid(row=0, column=2, pady=5)
+
+        # Load registered usernames
+        registered_users = [user["username"] for user in self.user_credentials]
+
+        # Create a string to display all registered usernames
+        users_text = "\n".join(registered_users)
+
+        # Create a Label widget to display registered usernames
+        regUse_display = tk.Label(chat_window, text=users_text, justify="left", anchor="w", bg="white")
+        regUse_display.grid(row=1, column=2, rowspan=3, pady=5)
 
         # Place widgets on the chat page grid
         conversation_label.grid(row=0, column=0, columnspan=2, pady=5)
@@ -196,8 +207,8 @@ class AuthenticationApp:
         new_message_label.grid(row=2, column=0, pady=5)
         self.new_message_entry.grid(row=2, column=1, pady=5)
         send_button.grid(row=3, column=0, columnspan=2, pady=10)
-        contacts_label.grid(row=0, column=2, pady=5)
-        contacts_text.grid(row=1, column=2, rowspan=3, pady=5)
+        regUse_label.grid(row=0, column=2, pady=5)
+        regUse_display.grid(row=1, column=2, rowspan=3, pady=5)
      
     @staticmethod   
     def scanUrl(url):
@@ -233,13 +244,9 @@ class AuthenticationApp:
 
         # Encrypt and send the message
         encrypted_msg = self.encrypt_message(message)
-        
         self.clientsocket.send(encrypted_msg.encode('utf-8'))
-        
-        self.conversation_text.insert(tk.END, f"server encrypted: {encrypted_msg}\n")
-        #decrypted_msg= self.decrypt_message(message)
-        #self.conversation_text.insert(tk.END, f"server: {decrypted_msg}\n")
-        self.conversation_text.see(tk.END)  # Scroll to the bottom
+        self.conversation_text.insert(tk.END, f"\n server encrypted: {encrypted_msg}\n")
+        self.conversation_text.see(tk.END)  
 
         if 'http://' in message.lower() or 'https://' in message.lower():
             self.conversation_text.insert(tk.END, f'{AuthenticationApp.scanUrl(message)}')
@@ -259,7 +266,7 @@ class AuthenticationApp:
                 chat_history = "\n".join([f"{row[0]} - {row[1]}: {row[2]}" for row in reader if row[1] == username])
                 # Update the Text widget to display chat history
                 self.conversation_text.insert(tk.END, chat_history)
-                self.conversation_text.see(tk.END)  # Scroll to the bottom
+                self.conversation_text.see(tk.END)  
         except FileNotFoundError:
             messagebox.showinfo("Chat History", "No chat history found.")
 
