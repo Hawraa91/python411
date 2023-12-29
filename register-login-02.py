@@ -181,9 +181,9 @@ class AuthenticationApp:
 
         # Initialize conversation_text widget
         conversation_label = tk.Label(chat_window, text="Conversation:")
-        self.conversation_text = tk.Text(chat_window, height=10, width=100)
+        self.conversation_text = tk.Text(chat_window, height=30, width=100)
         new_message_label = tk.Label(chat_window, text="New Message:")
-        self.new_message_entry = tk.Entry(chat_window, width=30)
+        self.new_message_entry = tk.Entry(chat_window, width=50)
         send_button = tk.Button(chat_window, text="Send", command=self.send_message)
 
         # Contacts placeholder
@@ -244,7 +244,7 @@ class AuthenticationApp:
         if 'http://' in message.lower() or 'https://' in message.lower():
             self.conversation_text.insert(tk.END, f'{AuthenticationApp.scanUrl(message)}')
             
-        self.conversation_text.insert(tk.END, f"server decrypted: {self.clientsocket.recv(1024).decode('utf-8')}")
+        self.conversation_text.insert(tk.END, f"server decrypted: {self.clientsocket.recv(1024).decode('utf-8')}\n")
 
         if message.lower() == 'stop chat':
             self.clientsocket.close()
