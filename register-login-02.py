@@ -242,6 +242,12 @@ class AuthenticationApp:
         message = self.new_message_entry.get()
         self.new_message_entry.delete(0, tk.END)
 
+        # stop chat, if statement should be checked before encrypting the message
+        if message.lower() == 'stop chat':
+            self.clientsocket.close()
+            messagebox.showinfo("Chat Closed", "Chat has been terminated.")
+            self.clientsocket = None
+        
         # Encrypt and send the message
         encrypted_msg = self.encrypt_message(message)
         self.clientsocket.send(encrypted_msg.encode('utf-8'))
@@ -252,11 +258,7 @@ class AuthenticationApp:
             self.conversation_text.insert(tk.END, f'{AuthenticationApp.scanUrl(message)}')
             
         self.conversation_text.insert(tk.END, f"server decrypted: {self.clientsocket.recv(1024).decode('utf-8')}\n")
-
-        if message.lower() == 'stop chat':
-            self.clientsocket.close()
-            messagebox.showinfo("Chat Closed", "Chat has been terminated.")
-            self.clientsocket = None
+ 
 
     def display_user_chat_history(self, username):
         all_chat_history_file = "all_chat_history.csv"
