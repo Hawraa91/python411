@@ -182,7 +182,7 @@ class AuthenticationApp:
 
         # Initialize conversation_text widget
         conversation_label = tk.Label(chat_window, text="Conversation:")
-        self.conversation_text = tk.Text(chat_window, height=30, width=100)
+        self.conversation_text = tk.Text(chat_window, height=30, width=80)
         new_message_label = tk.Label(chat_window, text="New Message:")
         self.new_message_entry = tk.Entry(chat_window, width=50)
         send_button = tk.Button(chat_window, text="Send", command=self.send_message)
@@ -198,8 +198,11 @@ class AuthenticationApp:
         users_text = "\n".join(registered_users)
 
         # Create a Label widget to display registered usernames
-        regUse_display = tk.Label(chat_window, text=users_text, justify="left", anchor="w", bg="white")
-        regUse_display.grid(row=1, column=2, rowspan=3, pady=5)
+        regUse_display = tk.Text(chat_window, height=20, width=20, wrap="word")
+        regUse_display.insert(tk.END, users_text)
+        regUse_display.config(state=tk.DISABLED)  # Make the Text widget read-only
+
+        regUse_display.grid(row=0, column=2, rowspan=5, pady=5)
 
         # Place widgets on the chat page grid
         conversation_label.grid(row=0, column=0, columnspan=2, pady=5)
@@ -208,7 +211,7 @@ class AuthenticationApp:
         self.new_message_entry.grid(row=2, column=1, pady=5)
         send_button.grid(row=3, column=0, columnspan=2, pady=10)
         regUse_label.grid(row=0, column=2, pady=5)
-        regUse_display.grid(row=1, column=2, rowspan=3, pady=5)
+        regUse_display.grid(row=1, column=2, rowspan=5, pady=5)
      
     @staticmethod   
     def scanUrl(url):
