@@ -22,8 +22,6 @@ class AuthenticationApp:
         # Load user credentials from the CSV file
         self.user_credentials = self.load_user_credentials()
 
-        self.send_button = tk.Button(root, text="Send Message", command=self.send_message)
-        self.send_button.grid(row=3, column=0, columnspan=2, pady=10)
 
         # Socket variables
         self.clientsocket = None
@@ -42,11 +40,11 @@ class AuthenticationApp:
 
         # Place widgets on the grid
         self.label_username.grid(row=0, column=0, pady=5)
-        self.entry_username.grid(row=0, column=1, pady=5)
+        self.entry_username.grid(row=0, column=3, pady=5)
         self.label_password.grid(row=1, column=0, pady=5)
-        self.entry_password.grid(row=1, column=1, pady=5)
-        self.login_button.grid(row=2, column=0, columnspan=2, pady=10)
-        self.switch_to_register_button.grid(row=3, column=0, columnspan=2, pady=5)
+        self.entry_password.grid(row=1, column=3, pady=5)
+        self.login_button.grid(row=2, column=2, columnspan=2, pady=10)
+        self.switch_to_register_button.grid(row=3, column=2, columnspan=2, pady=5)
 
         # Hide register widgets initially
         self.label_new_username = tk.Label(root, text="New Username:")
@@ -274,5 +272,6 @@ class AuthenticationApp:
 
 if __name__ == "__main__":
     root = tk.Tk()
+    root.geometry("400x200")
     app = AuthenticationApp(root)
     root.mainloop()
