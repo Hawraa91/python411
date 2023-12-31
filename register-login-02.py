@@ -22,16 +22,13 @@ class AuthenticationApp:
         # Load user credentials from the CSV file
         self.user_credentials = self.load_user_credentials()
 
-        self.send_button = tk.Button(root, text="Send Message", command=self.send_message)
-        self.send_button.grid(row=3, column=0, columnspan=2, pady=10)
-
-        # Socket variables
+         # Socket variables
         self.clientsocket = None
         self.key = b'Sixteen byte key'
         self.hashed_password = ''
         self.conversation_text = None
         self.new_message_entry = None
-
+        
         # Create widgets for login page
         self.label_username = tk.Label(root, text="Username:")
         self.entry_username = tk.Entry(root, textvariable=self.username_var)
@@ -42,11 +39,11 @@ class AuthenticationApp:
 
         # Place widgets on the grid
         self.label_username.grid(row=0, column=0, pady=5)
-        self.entry_username.grid(row=0, column=2, pady=5)
+        self.entry_username.grid(row=0, column=1, pady=5)
         self.label_password.grid(row=1, column=0, pady=5)
-        self.entry_password.grid(row=1, column=2, pady=5)
-        self.login_button.grid(row=2, column=2, columnspan=2, pady=10)
-        self.switch_to_register_button.grid(row=3, column=2, columnspan=2, pady=5)
+        self.entry_password.grid(row=1, column=1, pady=5)
+        self.login_button.grid(row=2, column=1, pady=10)
+        self.switch_to_register_button.grid(row=3, column=1, pady=5)
 
         # Hide register widgets initially
         self.label_new_username = tk.Label(root, text="New Username:")
@@ -64,6 +61,11 @@ class AuthenticationApp:
         self.register_button.grid_forget()
         self.switch_to_login_button.grid_forget()
         self.add_user_button.grid_forget()
+
+        # Initialize send_button_chat as a disabled button
+        self.send_button_chat = tk.Button(self.root, text="Send Message", command=self.send_message, state=tk.DISABLED)
+        self.send_button_chat.grid(row=10, column=0, columnspan=2, pady=10)
+
 
     def encrypt_message(self, plaintext):
         plaintext = plaintext.encode('utf-8')
@@ -146,9 +148,12 @@ class AuthenticationApp:
         self.entry_new_username.grid(row=0, column=1, pady=5)
         self.label_new_password.grid(row=1, column=0, pady=5)
         self.entry_new_password.grid(row=1, column=1, pady=5)
-        self.register_button.grid(row=2, column=0, columnspan=2, pady=10)
-        self.switch_to_login_button.grid(row=3, column=0, columnspan=2, pady=5)
-        self.add_user_button.grid(row=4, column=0, columnspan=2, pady=5)
+        self.register_button.grid(row=2, column=1, pady=10)
+        self.switch_to_login_button.grid(row=3, column=1, pady=5)
+        self.add_user_button.grid(row=4, column=1, pady=5)
+
+         # Hide the send_button_chat
+        self.send_button_chat.grid_forget()
 
     def switch_to_login(self):
         self.label_new_username.grid_forget()
@@ -163,9 +168,9 @@ class AuthenticationApp:
         self.entry_username.grid(row=0, column=1, pady=5)
         self.label_password.grid(row=1, column=0, pady=5)
         self.entry_password.grid(row=1, column=1, pady=5)
-        self.login_button.grid(row=2, column=0, columnspan=2, pady=10)
-        self.switch_to_register_button.grid(row=3, column=0, columnspan=2, pady=5)
-        self.add_user_button.grid(row=4, column=0, columnspan=2, pady=5)
+        self.login_button.grid(row=2, column=1, pady=10)
+        self.switch_to_register_button.grid(row=3, column=1, pady=5)
+
 
     def open_chat_page(self, username, hashed_password):
         # Create a new window for the chat page
@@ -178,7 +183,8 @@ class AuthenticationApp:
         # Send username and hashed password to the server
         self.clientsocket.send((username + '\n' + self.hashed_password).encode('utf-8'))
 
-        self.send_button.config(state=tk.NORMAL)  # Enable the send button
+        # Enable the send button for the chat page
+        self.send_button_chat.config(state=tk.NORMAL)
 
         # Initialize conversation_text widget
         conversation_label = tk.Label(chat_window, text="Conversation:")
@@ -277,6 +283,6 @@ class AuthenticationApp:
 
 if __name__ == "__main__":
     root = tk.Tk()
-    root.geometry("400x200")
+    root.geometry("280x150")
     app = AuthenticationApp(root)
     root.mainloop()
