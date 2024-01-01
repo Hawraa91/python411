@@ -269,7 +269,7 @@ class AuthenticationApp:
             self.clientsocket.send(encrypted_msg.encode('utf-8'))
             self.conversation_text.insert(tk.END, f"\n\nserver encrypted: {encrypted_msg}\n")
             self.conversation_text.see(tk.END) 
-            self.conversation_text.insert(tk.END, f"server decrypted: {self.clientsocket.recv(1024).decode('utf-8')}\n")
+            self.conversation_text.insert(tk.END, f"server decrypted: {self.clientsocket.recv(1024).decode('utf-8')}\n\n")
         
             if 'http://' in message.lower() or 'https://' in message.lower():
                 self.conversation_text.insert(tk.END, f'{AuthenticationApp.scanUrl(message)}')
