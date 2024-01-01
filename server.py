@@ -41,7 +41,7 @@ def handle_client(clientsocket, addr, key):
 
 
     print("Received client_name:", client_name)
-    print("Received hashed_password:", hashed_password)
+    #print("Received hashed_password:", hashed_password)
 
     while True:
         encrypted_msg = clientsocket.recv(1024).decode('utf-8')

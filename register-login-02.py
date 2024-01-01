@@ -193,7 +193,7 @@ class AuthenticationApp:
         # Initialize conversation_text widget
         conversation_label = tk.Label(chat_window, text="Conversation:")
         self.conversation_text = tk.Text(chat_window, height=30, width=80)
-        new_message_label = tk.Label(chat_window, text="New Message:")
+        new_message_label = tk.Label(chat_window, text="New Message (Enter 'stop chat' to terminate):")
         self.new_message_entry = tk.Entry(chat_window, width=50)
         send_button = tk.Button(chat_window, text="Send", command=self.send_message)
 
