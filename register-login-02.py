@@ -1,3 +1,4 @@
+import re
 import tkinter as tk
 from tkinter import messagebox
 import hashlib
@@ -122,9 +123,12 @@ class AuthenticationApp:
             if user["username"] == new_username:
                 messagebox.showerror("Registration Failed", "Username already exists")
                 return
-
+        # Regex
+        if (re.fullmatch(r'[A-Za-z0-9@#$%^&+=]{8,}', new_password)):
         # Hash the new password
-        hashed_password = hashlib.sha256(new_password.encode('utf-8')).hexdigest()
+            hashed_password = hashlib.sha256(new_password.encode('utf-8')).hexdigest()
+        else:
+           messagebox.showerror("Registeration failed", "Password should be At least 8 characters long.") 
 
         # Add new user credentials to the list
         new_user = {"username": new_username, "password": hashed_password}
@@ -253,21 +257,22 @@ class AuthenticationApp:
 
         # stop chat, if statement should be checked before encrypting the message
         if message.lower() == 'stop chat':
-            self.clientsocket.close()
+            encrypted_msg = self.encrypt_message(message)
+            self.clientsocket.send(encrypted_msg.encode('utf-8'))
+            self.conversation_text.insert(tk.END, f"\n server encrypted: {encrypted_msg}\n")
+            self.conversation_text.see(tk.END) 
             messagebox.showinfo("Chat Closed", "Chat has been terminated.")
+            self.clientsocket.close()
             self.clientsocket = None
+        else: # Encrypt and send the message
+            encrypted_msg = self.encrypt_message(message)
+            self.clientsocket.send(encrypted_msg.encode('utf-8'))
+            self.conversation_text.insert(tk.END, f"\n server encrypted: {encrypted_msg}\n")
+            self.conversation_text.see(tk.END) 
+            if 'http://' in message.lower() or 'https://' in message.lower():
+                self.conversation_text.insert(tk.END, f'{AuthenticationApp.scanUrl(message)}')
+            self.conversation_text.insert(tk.END, f"server decrypted: {self.clientsocket.recv(1024).decode('utf-8')}\n")
         
-        # Encrypt and send the message
-        encrypted_msg = self.encrypt_message(message)
-        self.clientsocket.send(encrypted_msg.encode('utf-8'))
-        self.conversation_text.insert(tk.END, f"\n server encrypted: {encrypted_msg}\n")
-        self.conversation_text.see(tk.END)  
-
-        if 'http://' in message.lower() or 'https://' in message.lower():
-            self.conversation_text.insert(tk.END, f'{AuthenticationApp.scanUrl(message)}')
-            
-        self.conversation_text.insert(tk.END, f"server decrypted: {self.clientsocket.recv(1024).decode('utf-8')}\n")
- 
 
     def display_user_chat_history(self, username):
         all_chat_history_file = "all_chat_history.csv"
