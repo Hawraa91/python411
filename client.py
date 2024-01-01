@@ -8,6 +8,7 @@ from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from cryptography.hazmat.primitives import padding
 from base64 import b64encode, b64decode
 import requests
+import os
 
 class AuthenticationApp:
     def __init__(self, root):
@@ -30,7 +31,7 @@ class AuthenticationApp:
         self.conversation_text = None
         self.new_message_entry = None
         
-        # Create widgets for login page
+        # Create elements for login page
         self.label_username = tk.Label(root, text="Username:")
         self.entry_username = tk.Entry(root, textvariable=self.username_var)
         self.label_password = tk.Label(root, text="Password:")
@@ -38,7 +39,7 @@ class AuthenticationApp:
         self.login_button = tk.Button(root, text="Login", command=self.login)
         self.switch_to_register_button = tk.Button(root, text="Don't have an account? Register", command=self.switch_to_register)
 
-        # Place widgets on the grid
+        # Place elements on the grid
         self.label_username.grid(row=0, column=0, pady=5)
         self.entry_username.grid(row=0, column=1, pady=5)
         self.label_password.grid(row=1, column=0, pady=5)
@@ -46,7 +47,7 @@ class AuthenticationApp:
         self.login_button.grid(row=2, column=1, pady=10)
         self.switch_to_register_button.grid(row=3, column=1, pady=5)
 
-        # Hide register widgets initially
+        # Hide register elements initially
         self.label_new_username = tk.Label(root, text="New Username:")
         self.entry_new_username = tk.Entry(root, textvariable=self.new_username_var)
         self.label_new_password = tk.Label(root, text="New Password:")
@@ -63,14 +64,14 @@ class AuthenticationApp:
         self.switch_to_login_button.grid_forget()
         self.add_user_button.grid_forget()
 
-        # Initialize send_button_chat as a disabled button
+        # disabled initialized send button
         self.send_button_chat = tk.Button(self.root, text="Send Message", command=self.send_message, state=tk.DISABLED)
         self.send_button_chat.grid(row=10, column=0, columnspan=2, pady=10)
 
 
     def encrypt_message(self, plaintext):
         plaintext = plaintext.encode('utf-8')
-        iv = b'1234567890123456'  
+        iv = os.urandom(16)  
         cipher = Cipher(algorithms.AES(self.key), modes.CBC(iv))
         encryptor = cipher.encryptor()
         padder = padding.PKCS7(128).padder()
@@ -102,16 +103,15 @@ class AuthenticationApp:
             return []
 
     def save_user_credentials(self):
-        # Save user credentials to the CSV file
+        # Save user credentials to csv from user credential list
         with open('user_credentials.csv', 'w', newline='') as csvfile:
             fieldnames = ['username', 'password']
             writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
 
-            # Write header if the file is empty
+            # write header if file is empty
             if csvfile.tell() == 0:
                 writer.writeheader()
 
-            # Write each user's credentials
             for user in self.user_credentials:
                 writer.writerow(user)
 
@@ -128,14 +128,13 @@ class AuthenticationApp:
         # Hash the new password
             hashed_password = hashlib.sha256(new_password.encode('utf-8')).hexdigest()
         else:
-           messagebox.showerror("Registeration failed", "Password should be At least 8 characters long.") 
+           messagebox.showerror("Registeration failed", "Password should be at least 8 characters long.") 
 
-        # Add new user credentials to the list
+        # add new user credentials to user credential list
         new_user = {"username": new_username, "password": hashed_password}
         self.user_credentials.append(new_user)
-
-        # Save updated user credentials to the CSV file
         self.save_user_credentials()
+        
 
         messagebox.showinfo("Registration Successful", "User {} registered successfully!".format(new_username))
         self.switch_to_login()
@@ -177,7 +176,6 @@ class AuthenticationApp:
 
 
     def open_chat_page(self, username, hashed_password):
-        # Create a new window for the chat page
         chat_window = tk.Toplevel(self.root)
         chat_window.title("Chat Page - {}".format(username))
         # Create a socket for the client
@@ -187,34 +185,24 @@ class AuthenticationApp:
         # Send username and hashed password to the server
         self.clientsocket.send((username + '\n' + self.hashed_password).encode('utf-8'))
 
-        # Enable the send button for the chat page
+        # enable send button 
         self.send_button_chat.config(state=tk.NORMAL)
-
-        # Initialize conversation_text widget
         conversation_label = tk.Label(chat_window, text="Conversation:")
         self.conversation_text = tk.Text(chat_window, height=30, width=80)
         new_message_label = tk.Label(chat_window, text="New Message (Enter 'stop chat' to terminate):")
         self.new_message_entry = tk.Entry(chat_window, width=50)
         send_button = tk.Button(chat_window, text="Send", command=self.send_message)
-
-        # Registered Users placeholder
+        #registered users display
         regUse_label = tk.Label(chat_window, text="Registered Users:")
         regUse_label.grid(row=0, column=2, pady=5)
-
-        # Load registered usernames
         registered_users = [user["username"] for user in self.user_credentials]
-
-        # Create a string to display all registered usernames
         users_text = "\n".join(registered_users)
-
-        # Create a Label widget to display registered usernames
         regUse_display = tk.Text(chat_window, height=20, width=20, wrap="word")
         regUse_display.insert(tk.END, users_text)
-        regUse_display.config(state=tk.DISABLED)  # Make the Text widget read-only
-
+        regUse_display.config(state=tk.DISABLED) 
         regUse_display.grid(row=0, column=2, rowspan=5, pady=5)
 
-        # Place widgets on the chat page grid
+        # Place elements on the chat page grid
         conversation_label.grid(row=0, column=0, columnspan=2, pady=5)
         self.conversation_text.grid(row=1, column=0, columnspan=2, pady=5)
         new_message_label.grid(row=2, column=0, pady=5)
@@ -225,7 +213,6 @@ class AuthenticationApp:
      
     @staticmethod   
     def scanUrl(url):
-    # Construct the URL for scanning
         apiurl = "https://www.virustotal.com/api/v3/urls"
         payload = {"url": f'{url}'}
         headers = {
@@ -233,17 +220,12 @@ class AuthenticationApp:
             "x-apikey": 'ddba54d29f6a46137aff14d2f1dd3e0ef2589e9fb811a1daca7562cda3dae120',
             "content-type": "application/x-www-form-urlencoded"
         }
-        # Make the request to VirusTotal
         response = requests.post(apiurl, data=payload, headers=headers)
-
         # Check the response
         if response.status_code == 200:
-            result = response.json()
-            print(f"Scan result for URL '{url}': {result}")
             return 'URL is safe to run \n'
-        else:
-            print(f"Error scanning URL '{url}': {response.text}")
-            return 'error scanning URL'
+        else: 
+            return 'Error scanning URL'
 
 
         
@@ -281,7 +263,6 @@ class AuthenticationApp:
             with open(all_chat_history_file, 'r') as history_file:
                 reader = csv.reader(history_file)
                 chat_history = "\n".join([f"{row[0]} - {row[1]}: {row[2]}" for row in reader if row[1] == username])
-                # Update the Text widget to display chat history
                 self.conversation_text.insert(tk.END, chat_history)
                 self.conversation_text.see(tk.END)  
         except FileNotFoundError:

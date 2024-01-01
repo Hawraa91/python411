@@ -17,18 +17,6 @@ def decrypt_message(key, ciphertext):
     plaintext = unpadder.update(decrypted_data) + unpadder.finalize()
     return plaintext.decode('utf-8')
 
-def register_user(username, hashed_password):
-    with open('user_credentials.csv', 'a', newline='') as csvfile:
-        writer = csv.writer(csvfile)
-        writer.writerow([username, hashed_password])
-
-def verify_credentials(username, hashed_password):
-    with open('user_credentials.csv', 'r') as csvfile:
-        reader = csv.reader(csvfile)
-        for row in reader:
-            if row[0] == username and row[1] == hashed_password:
-                return True
-    return False
 
 def start_new_client_thread(clientsocket, addr, key):
     _thread.start_new_thread(handle_client, (clientsocket, addr, key))
@@ -49,7 +37,6 @@ def handle_client(clientsocket, addr, key):
 
         # Send the decrypted message back to the client
         clientsocket.send(decrypted_msg.encode('utf-8'))
-        # Log the message to a CSV file with username, timestamp, and message
         current_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         if decrypted_msg.strip():  # Check if the decrypted message is non-empty
             if decrypted_msg.lower() != 'stop chat':  # Check if the message is not 'stop chat'
