@@ -240,7 +240,7 @@ class AuthenticationApp:
         if response.status_code == 200:
             result = response.json()
             print(f"Scan result for URL '{url}': {result}")
-            return result
+            return 'URL is safe to run \n'
         else:
             print(f"Error scanning URL '{url}': {response.text}")
             return 'error scanning URL'
@@ -259,7 +259,8 @@ class AuthenticationApp:
         if message.lower() == 'stop chat':
             encrypted_msg = self.encrypt_message(message)
             self.clientsocket.send(encrypted_msg.encode('utf-8'))
-            self.conversation_text.insert(tk.END, f"\n server encrypted: {encrypted_msg}\n")
+            #i commented this because 
+            #self.conversation_text.insert(tk.END, f"\n server encrypted: {encrypted_msg}\n")
             self.conversation_text.see(tk.END) 
             messagebox.showinfo("Chat Closed", "Chat has been terminated.")
             self.clientsocket.close()
@@ -267,12 +268,13 @@ class AuthenticationApp:
         else: # Encrypt and send the message
             encrypted_msg = self.encrypt_message(message)
             self.clientsocket.send(encrypted_msg.encode('utf-8'))
-            self.conversation_text.insert(tk.END, f"\n server encrypted: {encrypted_msg}\n")
+            self.conversation_text.insert(tk.END, f"\n\nserver encrypted: {encrypted_msg}\n")
             self.conversation_text.see(tk.END) 
-            if 'http://' in message.lower() or 'https://' in message.lower():
-                self.conversation_text.insert(tk.END, f'{AuthenticationApp.scanUrl(message)}')
             self.conversation_text.insert(tk.END, f"server decrypted: {self.clientsocket.recv(1024).decode('utf-8')}\n")
         
+            if 'http://' in message.lower() or 'https://' in message.lower():
+                self.conversation_text.insert(tk.END, f'{AuthenticationApp.scanUrl(message)}')
+            
 
     def display_user_chat_history(self, username):
         all_chat_history_file = "all_chat_history.csv"
