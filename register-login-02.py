@@ -259,7 +259,6 @@ class AuthenticationApp:
         if message.lower() == 'stop chat':
             encrypted_msg = self.encrypt_message(message)
             self.clientsocket.send(encrypted_msg.encode('utf-8'))
-            #i commented this because 
             #self.conversation_text.insert(tk.END, f"\n server encrypted: {encrypted_msg}\n")
             self.conversation_text.see(tk.END) 
             messagebox.showinfo("Chat Closed", "Chat has been terminated.")
