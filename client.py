@@ -134,8 +134,6 @@ class AuthenticationApp:
         new_user = {"username": new_username, "password": hashed_password}
         self.user_credentials.append(new_user)
         self.save_user_credentials()
-        
-
         messagebox.showinfo("Registration Successful", "User {} registered successfully!".format(new_username))
         self.switch_to_login()
 
@@ -226,9 +224,7 @@ class AuthenticationApp:
             return 'URL is safe to run \n'
         else: 
             return 'Error scanning URL'
-
-
-        
+ 
     def send_message(self):
         if not self.clientsocket:
             messagebox.showerror("Error", "Not connected to the server.")

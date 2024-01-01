@@ -1,11 +1,13 @@
 import socket
-import _thread
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from cryptography.hazmat.primitives import padding
 from base64 import b64decode
 import hashlib
 import csv
 import datetime
+import threading
+
+file_lock = threading.Lock() #for thread safety
 
 def decrypt_message(key, ciphertext):
     ciphertext = b64decode(ciphertext)
@@ -17,19 +19,16 @@ def decrypt_message(key, ciphertext):
     plaintext = unpadder.update(decrypted_data) + unpadder.finalize()
     return plaintext.decode('utf-8')
 
-
 def start_new_client_thread(clientsocket, addr, key):
-    _thread.start_new_thread(handle_client, (clientsocket, addr, key))
+    thread = threading.Thread(target=handle_client, args=(clientsocket, addr, key))
+    thread.start()
 
 def handle_client(clientsocket, addr, key):
     print("Got a connection from %s" % str(addr))
-    # Receive client_name and hashed_password
+    # Receive client name and hashed password
     client_info = clientsocket.recv(1024).decode('utf-8')
     client_name, hashed_password = client_info.split('\n')
-
-
     print("Received client_name:", client_name)
-    #print("Received hashed_password:", hashed_password)
 
     while True:
         encrypted_msg = clientsocket.recv(1024).decode('utf-8')
@@ -40,10 +39,11 @@ def handle_client(clientsocket, addr, key):
         current_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         if decrypted_msg.strip():  # Check if the decrypted message is non-empty
             if decrypted_msg.lower() != 'stop chat':  # Check if the message is not 'stop chat'
-            # Log the message to the CSV file with username, timestamp, and message
-                with open("all_chat_history.csv", "a", newline='') as all_chat_file:
-                    writer = csv.writer(all_chat_file)
-                    writer.writerow([current_time, client_name, decrypted_msg])
+                with file_lock:
+            # Lock the file access before writing
+                    with open("all_chat_history.csv", "a", newline='') as all_chat_file:
+                        writer = csv.writer(all_chat_file)
+                        writer.writerow([current_time, client_name, decrypted_msg])
 
 
         if decrypted_msg.lower() == "stop chat":
